@@ -1,0 +1,27 @@
+{
+  "name": "forFiction Theia",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "3000": {
+      "label": "Theia Frontend",
+      "onAutoForward": "openPreview"
+    },
+    "3001": {
+      "label": "NestJS Backend",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md", "RUN.md"]
+    }
+  },
+  "remoteEnv": {
+    "FORFICTION_BACKEND_URL": "http://localhost:3001"
+  }
+}

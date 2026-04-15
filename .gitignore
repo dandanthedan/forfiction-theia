@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+apps/theia/packages/*/lib/
+apps/theia/packages/*/node_modules/
+
+# NestJS
+apps/backend/node_modules/
+
+# OS
+.DS_Store
+*.log
+
+# Editor
+.vscode/extensions.json
+
+# Temporary
+/tmp/
