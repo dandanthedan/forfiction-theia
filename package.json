@@ -1,0 +1,25 @@
+{
+  "name": "@forfiction/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18",
+    "yarn": ">=1.7.0 <2"
+  },
+  "scripts": {
+    "build:theia": "yarn --cwd apps/theia/packages/browser-app bundle",
+    "start:theia": "yarn --cwd apps/theia/packages/browser-app start",
+    "build:services": "yarn --cwd apps/services build",
+    "dev:theia": "yarn --cwd apps/theia/packages/browser-app watch",
+    "build": "yarn build:theia && yarn build:services",
+    "start": "yarn start:theia"
+  },
+  "workspaces": [
+    "apps/theia/packages/*",
+    "apps/services/**",
+    "libs/**"
+  ],
+  "devDependencies": {
+    "lerna": "^8.0.0"
+  }
+}

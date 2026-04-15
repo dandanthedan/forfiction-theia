@@ -1,0 +1,29 @@
+{
+  "name": "@forfiction/extension-story-chat",
+  "keywords": ["theia-extension"],
+  "version": "0.0.0",
+  "files": ["lib", "src"],
+  "dependencies": {
+    "@theia/core": "latest",
+    "@theia/ai-core": "latest",
+    "@theia/ai-chat": "latest",
+    "@theia/editor": "latest",
+    "@theia/file-search": "latest",
+    "@theia Workspace": "latest"
+  },
+  "devDependencies": {
+    "rimraf": "latest",
+    "typescript": "~5.4.5"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/story-chat-frontend-module"
+    }
+  ]
+}

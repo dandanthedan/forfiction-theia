@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["ES2020", "DOM"],
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@theia/core": ["node_modules/@theia/core"],
+      "@theia/ai-core": ["node_modules/@theia/ai-core"],
+      "@theia/ai-chat": ["node_modules/@theia/ai-chat"],
+      "@theia/editor": ["node_modules/@theia/editor"],
+      "@theia/monaco": ["node_modules/@theia/monaco"],
+      "@theia/filesystem": ["node_modules/@theia/filesystem"],
+      "@theia/workspace": ["node_modules/@theia/workspace"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "lib"]
+}

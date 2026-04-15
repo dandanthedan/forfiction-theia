@@ -1,0 +1,38 @@
+{
+  "name": "@forfiction/browser-app",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@theia/core": "latest",
+    "@theia/editor": "latest",
+    "@theia/filesystem": "latest",
+    "@theia/markers": "latest",
+    "@theia/messages": "latest",
+    "@theia/monaco": "latest",
+    "@theia/navigator": "latest",
+    "@theia/preferences": "latest",
+    "@theia/process": "latest",
+    "@theia/terminal": "latest",
+    "@theia/workspace": "latest",
+    "@theia/ai-core": "latest",
+    "@theia/ai-chat": "latest",
+    "@forfiction/extension-story-memory": "0.0.0",
+    "@forfiction/extension-story-preferences": "0.0.0",
+    "@forfiction/extension-story-editor": "0.0.0",
+    "@forfiction/extension-story-chat": "0.0.0",
+    "@forfiction/extension-story-explorer": "0.0.0",
+    "@forfiction/extension-skills": "0.0.0"
+  },
+  "devDependencies": {
+    "@theia/cli": "latest"
+  },
+  "scripts": {
+    "bundle": "yarn rebuild && theia build --mode development",
+    "rebuild": "theia rebuild:browser --cacheRoot ..",
+    "start": "theia start",
+    "watch": "yarn rebuild && theia build --watch --mode development"
+  },
+  "theia": {
+    "target": "browser"
+  }
+}
