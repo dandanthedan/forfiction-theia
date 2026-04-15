@@ -100,32 +100,22 @@ yarn build:theia
 
 ---
 
-## Key Files
-
-| File | Purpose |
-|---|---|
-| `apps/theia/packages/extensions/story-chat/src/browser/orchestrator-agent.ts` | OrchestratorAgent → NestJS SSE |
-| `apps/theia/packages/extensions/story-chat/src/browser/nestjs-sse-client.ts` | EventSource SSE client |
-| `apps/theia/packages/extensions/story-editor/src/browser/streaming-content-handler.ts` | Monaco streaming insert |
-| `apps/theia/packages/extensions/skills/src/backend/skill-loader.service.ts` | skill.yaml loader |
-
----
-
 ## What's Working Now
 
 ✅ Story chat widget (right panel) — connects to NestJS SSE  
 ✅ OrchestratorAgent routing to NestJS `/:storyId/stream` endpoint  
 ✅ Content delta streaming (partial text chunks)  
 ✅ Agent step indicators  
-✅ Streaming insert into Monaco editor  
+✅ Streaming insert into Monaco editor via DOM events  
 ✅ Writing rules as Theia preferences  
 ✅ Skill YAML loading → prompt fragments  
-✅ Story memory variables (`{{story:characters}}`, etc.)  
+✅ **Story auto-detection** from open editor path  
+✅ **Auth token command** — `forFiction: Set Auth Token` (window.prompt)  
+✅ **Backend URL preference** — configurable  
 
 ## What's Stubbed
 
-⚠️ `setActiveStory()` — needs to detect open story from file path  
-⚠️ Auth token — Supabase token not yet passed to NestJS  
 ⚠️ Skill tree UI — skill browser sidebar not yet built  
 ⚠️ Story explorer — tree renders but context menu actions are stubs  
 ⚠️ Mastra pipeline wiring — uses legacy pipeline, not Mastra agents yet  
+⚠️ Login flow — uses window.prompt (fine for dev)  
