@@ -1,0 +1,130 @@
+/* forFiction Chat Widget Styles */
+
+.forfiction-chat-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--theia-editor-background);
+  color: var(--theia-editor-foreground);
+}
+
+.forfiction-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--theia-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.forfiction-header-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.forfiction-logo {
+  font-size: 16px;
+}
+
+.forfiction-story-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theia-descriptionForeground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forfiction-modes {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-btn {
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--theia-border-color);
+  background: transparent;
+  color: var(--theia-descriptionForeground);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-btn:hover {
+  background: var(--theia-toolbar-hoverBackground);
+}
+
+.mode-btn.active {
+  background: var(--theia-button-background);
+  color: var(--theia-button-foreground);
+  border-color: var(--theia-button-background);
+}
+
+.forfiction-agent-step {
+  font-size: 11px;
+  color: var(--theia-descriptionForeground);
+  font-family: var(--theia-code-font-family);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forfiction-agent-step.running {
+  color: var(--theia-progressBar-background);
+}
+
+.forfiction-agent-step.done {
+  color: var(--theia descriptionsForeground);
+}
+
+.forfiction-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ff-message {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+.ff-message.ff-user {
+  background: var(--theia-button-background);
+  color: var(--theia-button-foreground);
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+.ff-message.ff-agent {
+  background: var(--theia-sideBar-background);
+  color: var(--theia-editor-foreground);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.ff-message.ff-system {
+  background: transparent;
+  color: var(--theia-descriptionForeground);
+  font-size: 12px;
+  font-style: italic;
+  align-self: center;
+  text-align: center;
+}
+
+.forfiction-input-area {
+  border-top: 1px solid var(--theia-border-color);
+  padding: 8px;
+}
+
+/* Theia AI Chat input overrides */
+.theia-AIChat .chat-input {
+  border-radius: 6px;
+}

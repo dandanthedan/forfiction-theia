@@ -1,34 +1,47 @@
 import { MonacoEditor } from '@theia/monaco/lib/browser/monaco-editor';
-import { EditorWidget } from '@theia/editor/lib/browser/editor-widget';
+import { EditorManager } from '@theia/editor/lib/browser/editor-manager';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { Disposable } from '@theia/core';
 
 /**
  * StreamingContentHandler — inserts streamed Writer agent output
- * into the Monaco editor in real-time via incremental edits.
- * 
- * The Writer agent sends SSE content_delta events:
- *   { type: 'content_delta', data: { content: 'chunk of text' } }
- * 
- * This handler accumulates chunks and inserts them via
- * editor.executeEdits() for smooth streaming without flicker.
+ * into the Monaco editor in real-time.
+ *
+ * Receives content via:
+ * 1. Direct method call: `handler.onContentChunk(text)`
+ * 2. Custom DOM event: `window.addEventListener('forfiction:stream-content', ...)`
+ *
+ * The event approach is used by StoryChatWidget when streaming from the NestJS SSE.
  */
+@injectable()
 export class StreamingContentHandler {
+
+  @inject(EditorManager)
+  private readonly editorManager: EditorManager;
 
   private editor: MonacoEditor | null = null;
   private currentModel: ReturnType<MonacoEditor['getModel']> | null = null;
   private pendingText = '';
   private flushTimeout: ReturnType<typeof setTimeout> | null = null;
-  private readonly FLUSH_INTERVAL_MS = 50; // flush every 50ms for smooth streaming
+  private readonly FLUSH_INTERVAL_MS = 50;
+  private disposables: Disposable[] = [];
 
-  /**
-   * Attach to a Monaco editor instance.
-   */
-  attach(editor: MonacoEditor): void {
-    this.editor = editor;
-    this.currentModel = editor.getModel();
+  constructor() {
+    this.setupGlobalListener();
   }
 
   /**
-   * Detach and flush any remaining content.
+   * Attach to the currently active Monaco editor.
+   */
+  attach(editor: MonacoEditor): void {
+    this.detach();
+    this.editor = editor;
+    this.currentModel = editor.getModel();
+    this.pendingText = '';
+  }
+
+  /**
+   * Detach from current editor.
    */
   detach(): void {
     this.flush();
@@ -37,51 +50,62 @@ export class StreamingContentHandler {
   }
 
   /**
-   * Called when a content_delta SSE event arrives from the Writer agent.
-   * Accumulates text and schedules a flush.
+   * Listen for forfiction:stream-content events from the chat widget.
+   * This is how the chat widget streams content to the editor.
    */
+  private setupGlobalListener(): void {
+    const listener = (event: Event) => {
+      const e = event as CustomEvent<{ text: string; complete: boolean; storyId?: string }>;
+      if (e.detail.complete) {
+        this.onStreamComplete(e.detail.text);
+      } else {
+        this.onContentChunk(e.detail.text);
+      }
+    };
+    window.addEventListener('forfiction:stream-content', listener);
+    this.disposables.push({
+      dispose: () => window.removeEventListener('forfiction:stream-content', listener)
+    } as Disposable);
+  }
+
   onContentChunk(chunk: string): void {
+    // Auto-attach to active editor if not yet attached
+    if (!this.editor) {
+      const active = this.editorManager.activeEditor;
+      if (active) {
+        const monacoEditor = MonacoEditor.get(active);
+        if (monacoEditor) this.attach(monacoEditor);
+      }
+    }
+
     this.pendingText += chunk;
     this.scheduleFlush();
   }
 
-  /**
-   * Called when the stream completes (content_complete event).
-   */
-  onStreamComplete(): void {
+  onStreamComplete(fullText?: string): void {
     if (this.flushTimeout) {
       clearTimeout(this.flushTimeout);
       this.flushTimeout = null;
     }
-    this.flush();
-  }
 
-  /**
-   * Called on error — inserts remaining content as plain text.
-   */
-  onStreamError(error: string): void {
-    console.error('[forFiction] Stream error:', error);
-    if (this.pendingText) {
-      this.insertText(this.pendingText);
+    if (fullText !== undefined) {
+      // Final content — replace everything
       this.pendingText = '';
+      this.setFinalContent(fullText);
+    } else {
+      this.flush();
     }
   }
 
-  /**
-   * Replace all editor content with finalized text.
-   */
   setFinalContent(fullText: string): void {
     if (!this.editor || !this.currentModel) return;
-    this.pendingText = '';
-    if (this.flushTimeout) {
-      clearTimeout(this.flushTimeout);
-      this.flushTimeout = null;
-    }
 
     this.editor.getControl().executeEdits('forfiction-finalize', [{
       range: this.currentModel.getFullModelRange(),
       text: fullText
     }]);
+
+    this.scrollToBottom();
   }
 
   private scheduleFlush(): void {
@@ -96,23 +120,16 @@ export class StreamingContentHandler {
     if (!this.pendingText || !this.editor || !this.currentModel) return;
     const text = this.pendingText;
     this.pendingText = '';
-
     if (!text.trim()) return;
 
     const position = this.currentModel.getFullModelRange().getEndPosition();
     this.insertTextAt(text, position);
-  }
-
-  private insertText(text: string): void {
-    if (!this.editor || !this.currentModel) return;
-    const position = this.currentModel.getFullModelRange().getEndPosition();
-    this.insertTextAt(text, position);
+    this.scrollToBottom();
   }
 
   private insertTextAt(text: string, position: monaco.IPosition): void {
     if (!this.editor || !this.currentModel) return;
 
-    // Use executeEdits for Theia's undo history support
     this.editor.getControl().executeEdits('forfiction-stream', [
       {
         range: {
@@ -124,10 +141,18 @@ export class StreamingContentHandler {
         text
       }
     ]);
+  }
 
-    // Scroll to bottom
-    this.editor.getControl().setScrollPosition({
-      scrollTop: this.editor.getControl().getScrollHeight()
-    });
+  private scrollToBottom(): void {
+    if (!this.editor) return;
+    try {
+      const scrollHeight = this.editor.getControl().getScrollHeight();
+      this.editor.getControl().setScrollPosition({ scrollTop: scrollHeight });
+    } catch {}
+  }
+
+  dispose(): void {
+    this.disposables.forEach(d => d.dispose());
+    this.detach();
   }
 }
